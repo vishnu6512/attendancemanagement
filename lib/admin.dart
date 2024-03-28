@@ -136,28 +136,45 @@ class _AdminPageState extends State<AdminPage> {
           itemCount: leaveRequests.length,
           itemBuilder: (context, index) {
             var leaveRequest = leaveRequests[index];
-            return ListTile(
-              title: Text('User ID: ${leaveRequest['userId']}'),
-              subtitle: Text('Reason: ${leaveRequest['reason']}'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (status == 'pending')
-                    IconButton(
-                      icon: Icon(Icons.check, color: Colors.green),
-                      onPressed: () {
-                        _approveLeaveRequest(leaveRequest.id);
-                      },
-                    ),
-                  if (status == 'pending')
-                    IconButton(
-                      icon: Icon(Icons.close, color: Colors.red),
-                      onPressed: () {
-                        _rejectLeaveRequest(leaveRequest.id);
-                      },
-                    ),
-                ],
-              ),
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance.collection('users').doc(leaveRequest['userId']).get(),
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+                if (userSnapshot.hasError) {
+                  return Text('Error: ${userSnapshot.error}');
+                }
+                if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                  return Text('User not found');
+                }
+                var userData = userSnapshot.data!;
+                var username = userData['username'];
+                var userId = leaveRequest['userId'].substring(0, 8); // Display only the first 8 characters of the userID
+                return ListTile(
+                  title: Text('User ID: $userId - $username'),
+                  subtitle: Text('Reason: ${leaveRequest['reason']}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (status == 'pending')
+                        IconButton(
+                          icon: Icon(Icons.check, color: Colors.green),
+                          onPressed: () {
+                            _approveLeaveRequest(leaveRequest.id);
+                          },
+                        ),
+                      if (status == 'pending')
+                        IconButton(
+                          icon: Icon(Icons.close, color: Colors.red),
+                          onPressed: () {
+                            _rejectLeaveRequest(leaveRequest.id);
+                          },
+                        ),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );
@@ -185,21 +202,38 @@ class _AdminPageState extends State<AdminPage> {
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
             var attendanceData = snapshot.data!.docs[index];
-            // Parse timestamps to DateTime format
-            DateTime punchIn = (attendanceData['punchIn'] as Timestamp).toDate();
-            DateTime punchOut = (attendanceData['punchOut'] as Timestamp).toDate();
-            // Format DateTime as desired
-            String formattedPunchIn = DateFormat('yyyy-MM-dd HH:mm:ss').format(punchIn);
-            String formattedPunchOut = DateFormat('yyyy-MM-dd HH:mm:ss').format(punchOut);
-            return ListTile(
-              title: Text('User ID: ${attendanceData['userId']}'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Punch In: $formattedPunchIn'),
-                  Text('Punch Out: $formattedPunchOut'),
-                ],
-              ),
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance.collection('users').doc(attendanceData['userId']).get(),
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+                if (userSnapshot.hasError) {
+                  return Text('Error: ${userSnapshot.error}');
+                }
+                if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                  return Text('User not found');
+                }
+                var userData = userSnapshot.data!;
+                var username = userData['username'];
+                var userId = attendanceData['userId'].substring(0, 8); // Display only the first 8 characters of the userID
+                // Parse timestamps to DateTime format
+                DateTime punchIn = (attendanceData['punchIn'] as Timestamp).toDate();
+                DateTime punchOut = (attendanceData['punchOut'] as Timestamp).toDate();
+                // Format DateTime as desired
+                String formattedPunchIn = DateFormat('yyyy-MM-dd HH:mm:ss').format(punchIn);
+                String formattedPunchOut = DateFormat('yyyy-MM-dd HH:mm:ss').format(punchOut);
+                return ListTile(
+                  title: Text('User ID: $userId - $username'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Punch In: $formattedPunchIn'),
+                      Text('Punch Out: $formattedPunchOut'),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );
