@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'signin.dart'; // Import your sign-in page
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -29,7 +30,11 @@ class _SignUpPageState extends State<SignUpPage> {
         'role': 'user', // Set role to 'user' by default
       });
 
-      // Navigate to success page or home page
+      // Navigate to sign-in page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SignInPage()),
+      );
     } catch (e) {
       print('Error signing up: $e');
       // Handle sign-up errors
@@ -79,4 +84,5 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
+
 
