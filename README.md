@@ -1,16 +1,14 @@
-# mngmt
+Employee Management App
 
-A new Flutter project.
+This Flutter application helps manage employee attendance and leave requests.
+Features
 
-## Getting Started
+  Mark Attendance: Employees can mark their attendance by punching in and out. Attendance is tracked with timestamp.
+  Request Leave: Employees can submit leave requests specifying the reason, start date, and end date.
+  Admin Dashboard: Admins can view leave requests, approve or reject them, and view attendance details of all employees.
 
-This project is a starting point for a Flutter application.
+Technologies Used
 
-A few resources to get you started if this is your first Flutter project:
+  Flutter: Frontend framework for building cross-platform mobile applications.
+  Firebase: Backend services for authentication, database (Firestore), and storage.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
